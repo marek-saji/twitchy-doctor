@@ -51,5 +51,17 @@ scrollIfNeeded();
 // setInterval(scrollIfNeeded, 10 * 1000);
 
 function scrollIfNeeded () {
-  schedule.forEach
+  const now = new Date();
+  const entries = Array.from(scheduleData.entries());
+  for (let i in entries) {
+    let [date] = entries[i];
+    if (now < date)
+    {
+      console.log(entries[i][1].item);
+      break;
+    }
+  }
+  console.log(
+    scheduleData.entries()
+  );
 }
