@@ -37,11 +37,15 @@ scheduleData.forEach(row => {
   item.className = 'schedule__item';
   
   d.className = 'schedule__time';
-  d.textContent = date.toString(); // TODO format
+  d.textContent = date.toLocaleString();
   d.datetime = date.toISOString();
   
   t.className = 'schedule__title';
   t.textContent = titles.join(", ");
+  
+  // TODO Link to Wikipedia
+  // TODO Which doctor?
+  // TODO Titles of episodes
   
   item.append(d);
   item.append(t);
@@ -66,7 +70,10 @@ function scrollIfNeeded () {
       scheduleData[i].item.dataset.current = 'true';
       // TODO Only if needed
       // TODO Animate
-      scheduleData[i].item.scrollIntoViewIfNeeded();
+      scheduleData[i].item.scrollIntoView({
+        block: "start",
+        behaviour: "smooth",
+      });
       break;
     }
   }
