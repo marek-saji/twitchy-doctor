@@ -1,8 +1,9 @@
 {
   "lang":"en_GB",
   "name":"Twitchy Doctor",
-  "icons":[{"sizes":"any","type":"image\/svg+xml","src":"https://cdn.glitch.com/ce23eaf7-7bcd-4453-84f3-aea00163381d%2Ftardis-2311634.svg?1527808227377"}],
+  "icons":[{"sizes":"any","type":"image/svg+xml","src":"https://cdn.glitch.com/ce23eaf7-7bcd-4453-84f3-aea00163381d%2Ftardis-2311634.svg?1527808227377"}],
   "display":"standalone",
   "theme_color":"white",
   "background_color":"white",
   "categories":["doctorWho","twitch","schedule"]
+}

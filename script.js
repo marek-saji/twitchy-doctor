@@ -65,12 +65,14 @@ function scrollIfNeeded () {
   const now = new Date();
   for (let i in scheduleData) {
     i = parseInt(i, 10);
+    // FIXME Match last
     if (scheduleData[i].start < now && scheduleData[i+1] && now < scheduleData[i+1].start)
     {
       Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
       scheduleData[i].item.dataset.current = 'true';
       // TODO Only if needed
       // TODO Animate
+      // FIXME Broken on iOS?
       scheduleData[i].item.scrollIntoView({
         block: "start",
         behaviour: "smooth",
