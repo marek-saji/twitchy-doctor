@@ -16,11 +16,12 @@ const scheduleData = scheduleTsv
       if (2 !== i && row[i] < row[2]) {
         d.setDate(d.getDate() + 1);
       }
-      d.setHours(parseInt(h, 10) - d.getTimezoneOffset() / 60);
+      // FIXME Wtf? -1?!
+      d.setHours(parseInt(h, 10) - d.getTimezoneOffset() / 60 - 1);
       d.setMinutes(parseInt(m, 10));
-      // FIXME one row per title?
+      // FIXME one row per title, if I can get episode duration from somewhere
       rows.push({
-        date: d,
+        start: d,
         titles: titles,
       });
     }
@@ -28,8 +29,8 @@ const scheduleData = scheduleTsv
     return rows;
   }, []);
 
-[scheduleData[0]].forEach(row => {
-  const {date, titles} = row;
+scheduleData.forEach(row => {
+  const {start, titles} = row;
   const item = document.createElement('li');
   const d = document.createElement('time');
   const t = document.createElement('div');
@@ -37,8 +38,8 @@ const scheduleData = scheduleTsv
   item.className = 'schedule__item';
   
   d.className = 'schedule__time';
-  d.textContent = date.toLocaleString();
-  d.datetime = date.toISOString();
+  d.textContent = start.toLocaleString();
+  d.datetime = start.toISOString();
   
   t.className = 'schedule__title';
   t.textContent = titles.join(", ");
@@ -58,13 +59,13 @@ schedule.className = 'schedule';
 document.body.appendChild(schedule);
 scheduleTsvSource.style.display = 'none';
 scrollIfNeeded();
-// setInterval(scrollIfNeeded, 10 * 1000);
+setInterval(scrollIfNeeded, 10 * 1000);
 
 function scrollIfNeeded () {
   const now = new Date();
   for (let i in scheduleData) {
     i = parseInt(i, 10);
-    if (scheduleData[i].date < now && scheduleData[i+1] && now < scheduleData[i+1].date)
+    if (scheduleData[i].start < now && scheduleData[i+1] && now < scheduleData[i+1].start)
     {
       Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
       scheduleData[i].item.dataset.current = 'true';

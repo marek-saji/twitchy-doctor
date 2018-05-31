@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Hello!</title>
+    <title>Twitchy Doctor</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,8 +9,10 @@
     <script src="/script.js" defer></script>
   </head>  
   <body>
+    <!-- FIXME muted=false does not seem to be working -->
+    <!-- FIXME Fullscreen works on the whole page, not just the player... -->
     <iframe
-      src="https://player.twitch.tv/?muted=false&channel=twitchpresents"
+      src="https://player.twitch.tv/?channel=twitchpresents&muted=false"
       allowfullscreen
     >
       <a href="https://www.twitch.tv/twitchpresents">Watch</a>
