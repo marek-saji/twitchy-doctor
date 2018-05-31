@@ -28,7 +28,7 @@ const scheduleData = scheduleTsv
     return rows;
   }, []);
 
-scheduleData.forEach(row => {
+[scheduleData[0]].forEach(row => {
   const {date, titles} = row;
   const item = document.createElement('li');
   const d = document.createElement('time');
@@ -58,7 +58,7 @@ schedule.className = 'schedule';
 document.body.appendChild(schedule);
 scheduleTsvSource.style.display = 'none';
 scrollIfNeeded();
-setInterval(scrollIfNeeded, 10 * 1000);
+// setInterval(scrollIfNeeded, 10 * 1000);
 
 function scrollIfNeeded () {
   const now = new Date();
