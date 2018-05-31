@@ -39,7 +39,7 @@ scheduleData.forEach(row => {
   
   d.className = 'schedule__time';
   d.textContent = start.toLocaleString();
-  d.datetime = start.toISOString();
+  d.datetime = start.toISOString().replace(/:00$/, "");
   
   t.className = 'schedule__title';
   t.textContent = titles.join(", ");
