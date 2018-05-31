@@ -40,8 +40,16 @@ scheduleData.forEach((titles, date) => {
   item.append(d);
   item.append(t);
   schedule.append(item);
+  
+  scheduleData.set(date, {titles, item});
 });
 
 schedule.className = 'schedule';
 document.body.appendChild(schedule);
 scheduleTsvSource.style.display = 'none';
+scrollIfNeeded();
+// setInterval(scrollIfNeeded, 10 * 1000);
+
+function scrollIfNeeded () {
+  schedule.forEach
+}

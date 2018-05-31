@@ -2,27 +2,35 @@
 
 body {
   font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;
-  margin: 2em;
+  margin: 0;
+  display: grid;
+  height: 100vh;
 }
 
 iframe {
   width: 100%;
+  border: 0;
 }
 
 .schedule {
   margin: 0;
-  padding: 0;
+  padding: 1em;
+  overflow: scroll;
 }
 
 .schedule__item {
   list-style: none;
   display: flex;
-  flex-wrap: wrap
+  flex-wrap: wrap;
+  margin-bottom: 1em;
 }
 
 .schedule__time {
+  flex: 1 0 50%;
 }
 
 .schedule__title {
-  font-size: 
+  flex: 1 0 50%;
+  min-width: 20em;
+  font-size: 1.5em;
 }
