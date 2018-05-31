@@ -13,9 +13,11 @@ const scheduleData = scheduleTsv
     {
       let [h, m] = row[i].split(":");
       let d = new Date(date);
+      if (2 !== i && row[i] < row[2]) {
+        d.setDate(d.getDate() + 1);
+      }
       d.setHours(parseInt(h, 10) - d.getTimezoneOffset() / 60);
       d.setMinutes(parseInt(m, 10));
-      // FIXME last is for next day
       // FIXME one row per title?
       rows.push({
         date: d,
@@ -47,21 +49,24 @@ scheduleData.forEach(row => {
   
   row.item = item;
 });
-console.log(scheduleData);
 
 schedule.className = 'schedule';
 document.body.appendChild(schedule);
 scheduleTsvSource.style.display = 'none';
 scrollIfNeeded();
-// setInterval(scrollIfNeeded, 10 * 1000);
+setInterval(scrollIfNeeded, 10 * 1000);
 
 function scrollIfNeeded () {
   const now = new Date();
   for (let i in scheduleData) {
+    i = parseInt(i, 10);
     if (scheduleData[i].date < now && scheduleData[i+1] && now < scheduleData[i+1].date)
     {
-      console.log(i, i+1, scheduleData[i], now, scheduleData[i+1]);
-      console.log(scheduleData[i].item);
+      Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
+      scheduleData[i].item.dataset.current = 'true';
+      // TODO Only if needed
+      // TODO Animate
+      scheduleData[i].item.scrollIntoViewIfNeeded();
       break;
     }
   }
