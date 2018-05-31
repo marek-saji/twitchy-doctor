@@ -16,16 +16,32 @@ const scheduleData = scheduleTsv
       d.setHours(parseInt(h, 10) - d.getTimezoneOffset() / 60);
       d.setMinutes(parseInt(m, 10));
       // FIXME last is for next day
+      // FIXME one row per title?
       rows.set(d, titles);
     }
 
     return rows;
   }, new Map());
 
-scheduleTsvSource.style.display = 'none';
-document.body.appendChild(schedule);
-
 scheduleData.forEach((titles, date) => {
-  const d = document.createElement('date');
+  const item = document.createElement('li');
+  const d = document.createElement('time');
+  const t = document.createElement('div');
   
+  item.className = 'schedule__item';
+  
+  d.className = 'schedule__time';
+  d.textContent = date.toString(); // TODO format
+  d.datetime = date.toISOString();
+  
+  t.className = 'schedule__title';
+  t.textContent = titles.join(", ");
+  
+  item.append(d);
+  item.append(t);
+  schedule.append(item);
 });
+
+schedule.className = 'schedule';
+document.body.appendChild(schedule);
+scheduleTsvSource.style.display = 'none';
