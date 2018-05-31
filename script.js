@@ -17,13 +17,17 @@ const scheduleData = scheduleTsv
       d.setMinutes(parseInt(m, 10));
       // FIXME last is for next day
       // FIXME one row per title?
-      rows.set(d, titles);
+      rows.push({
+        date: d,
+        titles: titles,
+      });
     }
 
     return rows;
-  }, new Map());
+  }, []);
 
-scheduleData.forEach((titles, date) => {
+scheduleData.forEach(row => {
+  const {date, titles} = row;
   const item = document.createElement('li');
   const d = document.createElement('time');
   const t = document.createElement('div');
@@ -41,8 +45,9 @@ scheduleData.forEach((titles, date) => {
   item.append(t);
   schedule.append(item);
   
-  scheduleData.set(date, {titles, item});
+  row.item = item;
 });
+console.log(scheduleData);
 
 schedule.className = 'schedule';
 document.body.appendChild(schedule);
@@ -52,16 +57,12 @@ scrollIfNeeded();
 
 function scrollIfNeeded () {
   const now = new Date();
-  const entries = Array.from(scheduleData.entries());
-  for (let i in entries) {
-    let [date] = entries[i];
-    if (now < date)
+  for (let i in scheduleData) {
+    if (scheduleData[i].date < now && scheduleData[i+1] && now < scheduleData[i+1].date)
     {
-      console.log(entries[i][1].item);
+      console.log(i, i+1, scheduleData[i], now, scheduleData[i+1]);
+      console.log(scheduleData[i].item);
       break;
     }
   }
-  console.log(
-    scheduleData.entries()
-  );
 }
