@@ -1,27 +1,23 @@
-self.addEventListener('install', function(event) {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('complete').then(function(cache) {
-      return cache.addAll([
+    caches
+      .open('complete')
+      .then(cache => cache.addAll([
         '/style.css',
         '/script.js',
-        '/index.html',
+        '/',
         '/data/wikipedia-serials.html',
-      ]);
-    })
+      ]))
   );
 });
 
-self.addEventListener('fetch', function(event) {
-  console.log("old", event.request);
+self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(function() {
-      if (/\/$/.test(event.request.url))
-      {
-        event.request.url += "index.html";
-      }
-      console.log("new", event.request);
-      caches.match(event.request).then(console.log);
-      return caches.match(event.request);
-    })
+    caches.open('complete').then(cache => {
+      fetch(event.request).then(response => {
+        cache.put(event.request, response.clone());
+        return response || caches.match(event.request);
+      });
+    });
   );
 });
