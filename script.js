@@ -8,7 +8,7 @@ Promise.all([getScheduleData(), getWikipediaData()])
   .then(schedule => { document.body.appendChild(schedule); })
   .then(() => { scheduleTsvSource.style.display = 'none'; });
 
-// scrollIfNeeded();
+scrollIfNeeded();
 // setInterval(scrollIfNeeded, 10 * 1000);
 
 function getScheduleData () {
@@ -52,6 +52,7 @@ function getWikipediaData () {
         (rows, tr) => {
           const ep = tr.children[0].id.replace(/^ep/, "");
           const storyTitle = tr.querySelector(".summary a").textContent;
+          // FIXME Later episodes do not get unique titles
           const episodes = Array.from(tr.querySelector(".summary").childNodes)
             .filter(ch => ch instanceof Text)
             .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
@@ -125,10 +126,9 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
 
 function createScheduleDom (data) {
   const schedule = document.createElement('ol');
-  console.log(data[0], data[1]);
   schedule.className = 'schedule';
   data.forEach(row => {
-    const {start, end, estimated, storyTitle, episodeTitle} = row;
+    const {start, end, estimated, storyTitle, episodeTitle, episodeTotal} = row;
     const item = document.createElement('li');
     const d = document.createElement('time');
     const t = document.createElement('div');
@@ -141,7 +141,14 @@ function createScheduleDom (data) {
     d.datetime = start.toISOString();
 
     t.className = 'schedule__title';
-    t.textContent = storyTitle + ": " + episodeTitle;
+    if (1 == episodeTotal)
+    {
+      t.textContent = storyTitle;
+    }
+    else
+    {
+      t.textContent = storyTitle + ": " + episodeTitle;
+    }
 
     // TODO Link to Wikipedia
     // TODO Which doctor?
@@ -156,23 +163,37 @@ function createScheduleDom (data) {
   return schedule;
 }
 
-// function scrollIfNeeded () {
-//   const now = new Date();
-//   for (let i in scheduleData) {
-//     i = parseInt(i, 10);
-//     // FIXME Match last
-//     if (scheduleData[i].start < now && now < scheduleData[i].end)
-//     {
-//       Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
-//       scheduleData[i].item.dataset.current = 'true';
-//       // TODO Only if needed
-//       // TODO Animate
-//       // FIXME Broken on iOS?
-//       scheduleData[i].item.scrollIntoView({
-//         block: "start",
-//         behaviour: "smooth",
-//       });
-//       break;
-//     }
-//   }
-// }
+function scrollIfNeeded () {
+  const now = new Date();
+  const end = new Date(now);
+  end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
+  const nowString = now.toISOString();
+  const endString = end.toISOString();
+  
+  console.log("", nowString, endString);
+  Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
+  for (let dateElement of document.querySelectorAll("time"))
+  {
+    if (dateElement.datetime < nowString && endString < dateElement.datetime)
+    {
+      console.log(dateElement.parent);
+    }
+  }
+  
+  // for (let i in scheduleData) {
+  //   i = parseInt(i, 10);
+  //   // FIXME Match last
+  //   if (scheduleData[i].start < now && now < scheduleData[i].end)
+  //   {
+  //     Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
+  //     scheduleData[i].item.dataset.current = 'true';
+  //     // TODO Only if needed
+  //     // TODO Animate
+  //     // FIXME Broken on iOS?
+  //     scheduleData[i].item.scrollIntoView({
+  //       block: "start",
+  //       behaviour: "smooth",
+  //     });
+  //     break;
+  //   }
+}
