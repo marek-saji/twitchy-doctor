@@ -2,14 +2,17 @@ const EP_DURATION_MIN = 25;
 
 const scheduleTsvSource = document.getElementById('schedule-raw');
 
+
 Promise.all([getScheduleData(), getWikipediaData()])
   .then(joinScheduleAndWikipediaData)
   .then(createScheduleDom)
   .then(schedule => { document.body.appendChild(schedule); })
   .then(() => { scheduleTsvSource.style.display = 'none'; })
-  .then(() => { scrollIfNeeded(); });
+  .then(() => {
+    scrollIfNeeded();
+    setInterval(scrollIfNeeded, 10 * 1000);
+  });
 
-// setInterval(scrollIfNeeded, 10 * 1000);
 
 function getScheduleData () {
   return scheduleTsvSource.textContent
@@ -101,9 +104,9 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
   
   for (let scheduleRow of scheduleData) {
     let previousEnd = new Date(scheduleRow.start);
-    for (let [idx, storyTitle] of scheduleRow.titles.entries()) {
+    for (let [stdx, storyTitle] of scheduleRow.titles.entries()) {
       let storyData = getStoryData(storyTitle);
-      for (let episodeTitle of storyData.episodes) {
+      for (let [epIdx, episodeTitle] of storyData.episodes.entries()) {
         let start = new Date(previousEnd);
         let end = new Date(start);
         end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
@@ -112,8 +115,10 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
           end: end,
           estimated: idx > 0,
           storyTitle: storyTitle,
+          storyNumber: storyData.ep,
           episodeTitle: episodeTitle,
-          // TODO episodeNo, episodeTotal, storyNo
+          episodeNumber: idx + 1,
+          episodeTotal: storyData.episodes.length,
         };
         data.push(row);
         previousEnd = end;
@@ -141,18 +146,17 @@ function createScheduleDom (data) {
     d.datetime = start.toISOString();
 
     t.className = 'schedule__title';
-    if (1 == episodeTotal)
+    if (1 === episodeTotal)
     {
       t.textContent = storyTitle;
     }
     else
     {
-      t.textContent = storyTitle + ": " + episodeTitle;
+      t.textContent = `${storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${episodeTitle}`;
     }
 
     // TODO Link to Wikipedia
     // TODO Which doctor?
-    // TODO Titles of episodes
 
     item.append(d);
     item.append(t);

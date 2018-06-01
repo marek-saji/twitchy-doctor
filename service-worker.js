@@ -1,13 +1,13 @@
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches
-      .open('complete')
-      .then(cache => cache.addAll([
+    caches.open('complete').then(cache =>
+      cache.addAll([
         '/style.css',
         '/script.js',
         '/',
         '/data/wikipedia-serials.html',
-      ]))
+      ])
+    )
   );
 });
 
@@ -18,6 +18,6 @@ self.addEventListener('fetch', event => {
         cache.put(event.request, response.clone());
         return response || caches.match(event.request);
       });
-    });
+    })
   );
 });
