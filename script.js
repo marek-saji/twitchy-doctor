@@ -81,3 +81,16 @@ function scrollIfNeeded () {
     }
   }
 }
+
+
+
+fetch("/data/wikipedia-serials.html")
+  .then(response => response.text())
+  .then(html => {
+    const fragment = document.createDocumentFragment();
+    fragment.innerHTML = html;
+  window.foo = fragment;
+    Array.from(fragment.querySelectorAll(".wikiepisodetable")).forEach(table => {
+      console.log(table);
+    });
+  });
