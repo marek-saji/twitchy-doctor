@@ -163,20 +163,46 @@ function createScheduleDom (data) {
   return schedule;
 }
 
+function deactivateOther () {
+    Array.from(document.querySelectorAll("[data-state]")).forEach(e => { delete e.dataset.current; });
+}
+
+function scrollTo (element) {
+  element.scrollIntoView({
+    block: "start",
+    behaviour: "smooth",
+  });
+  console.log(element);
+}
+
+function activateCurrent (element) {
+  deactivateOther();
+  element.dataset.state = "current";
+  scrollTo(element);
+}
+
+function activateNext (element, scroll) {
+  deactivateOther();
+  element.dataset.state = "next";
+  if (scroll) scrollTo(element);
+}
+
 function scrollIfNeeded () {
-  const now = new Date('2018-05-29T19:20'); // FIXME DEBUG
-  
-  Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
+  const now = new Date(); // FIXME DEBUG
+  let foundCurrent = false;
   
   for (let dateElement of document.querySelectorAll("time")) {
     let start = new Date(dateElement.datetime);
     let end = new Date(start);
     end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
     if (start <= now && now <= end) {
-      activate(dataElement.parentElement);
-      break;
+      activateCurrent(dateElement.parentElement);
+      foundCurrent = true;
     }
-    // FIXME With no perfect match, scroll to closest.
+    else if (now < start) {
+      activateNext(dateElement.parentElement, ! foundCurrent);
+      return;
+    }
   }
   
   // for (let i in scheduleData) {
