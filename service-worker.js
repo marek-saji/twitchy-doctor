@@ -13,11 +13,13 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.open('complete').then(cache => {
-      fetch(event.request).then(response => {
-        cache.put(event.request, response.clone());
-        return response || caches.match(event.request);
-      });
-    })
+    caches.open('complete').then(cache =>
+      fetch(event.request)
+        .then(response => {
+          cache.put(event.request, response.clone());
+          return response || caches.match(event.request);
+        })
+        .catch(() => caches.match(event.request))
+    )
   );
 });
