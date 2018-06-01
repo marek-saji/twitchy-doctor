@@ -1,3 +1,5 @@
+const EP_DURATION_MIN = 25;
+
 const scheduleTsvSource = document.getElementById('schedule-raw');
 
 Promise.all([getScheduleData(), getWikipediaData()])
@@ -73,9 +75,15 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
   const data = [];
   
   for (let scheduleRow of scheduleData) {
-    for (let title of scheduleData.titles || []) {
+    for (let [idx, title] of scheduleRow.titles.entries()) {
+      let start = new Date(scheduleRow.start);
+      start.setMinutes(start.getMinutes() + idx * EP_DURATION_MIN);
+      let end = new Date(start);
+      end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
       let row = {
-        start: scheduleData.start,
+        start: start,
+        end: end,
+        estimated: idx > 0,
         title: title,
       };
       data.push(row);
@@ -88,10 +96,10 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
 
 function createScheduleDom (data) {
   const schedule = document.createElement('ol');
-  console.log(data[0]);
+  console.log(data[0], data[1]);
   schedule.className = 'schedule';
   data.forEach(row => {
-    const {start, titles} = row;
+    const {start, titles, title, estimated} = row;
     const item = document.createElement('li');
     const d = document.createElement('time');
     const t = document.createElement('div');
@@ -100,10 +108,11 @@ function createScheduleDom (data) {
 
     d.className = 'schedule__time';
     d.textContent = start.toLocaleString().replace(/:00$/, "");
+    if (estimated) d.textContent += " or a bit later"; // FIXME
     d.datetime = start.toISOString();
 
     t.className = 'schedule__title';
-    t.textContent = titles.join(", ");
+    t.textContent = title || titles.join(", ");
 
     // TODO Link to Wikipedia
     // TODO Which doctor?
