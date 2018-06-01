@@ -5,17 +5,22 @@ body {
   height: 100vh;
 }
 
-iframe {
+#player {
   width: 100%;
   height: 40vh;
   border: 0;
   /* TODO Resizeable? */
 }
 
-.schedule {
+#content {
   margin: 0;
   padding: 0.5em 0;
   overflow: scroll;
+}
+
+.schedule {
+  margin: 0;
+  padding: 0;
 }
 
 .schedule__item {

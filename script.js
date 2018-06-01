@@ -155,7 +155,7 @@ function createScheduleDom (data) {
       t.textContent = `${storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${episodeTitle}`;
     }
     t.target = "_blank";
-    t.rel = "noopener noreferer";
+    t.rel = "noopener noreferrer";
     t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
 
     // TODO Link to Wikipedia
