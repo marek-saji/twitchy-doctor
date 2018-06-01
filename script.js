@@ -43,12 +43,12 @@ function getScheduleData () {
 function getWikipediaData () {
   return fetch("/data/wikipedia-serials.html")
     .then(response => response.text())
+    // Dummy way to disable loading images.
+    .then(html => html.replace(/<img /g, '<x-img '))
     .then(html => {
-      const fragment = document.createDocumentFragment();
       const dataSource = document.createElement("div");
-      fragment.append(dataSource);
       dataSource.innerHTML = html;
-      return Array.from(fragment.querySelectorAll(".wikiepisodetable .vevent")).reduce(
+      return Array.from(dataSource.querySelectorAll(".wikiepisodetable .vevent")).reduce(
         (rows, tr) => {
           const ep = tr.children[0].id.replace(/^ep/, "");
           const storyTitle = tr.querySelector(".summary a").textContent;

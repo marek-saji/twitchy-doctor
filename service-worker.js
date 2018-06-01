@@ -12,8 +12,15 @@ self.addEventListener('install', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+  console.log("old", event.request);
   event.respondWith(
     fetch(event.request).catch(function() {
+      if (/\/$/.test(event.request.url))
+      {
+        event.request.url += "index.html";
+      }
+      console.log("new", event.request);
+      caches.match(event.request).then(console.log);
       return caches.match(event.request);
     })
   );
