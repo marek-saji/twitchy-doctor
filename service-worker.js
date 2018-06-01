@@ -5,6 +5,7 @@ self.addEventListener('install', function(event) {
         '/style.css',
         '/script.js',
         '/index.html',
+        '/data/wikipedia-serials.html',
       ]);
     })
   );
