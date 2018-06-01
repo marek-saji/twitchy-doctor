@@ -1,6 +1,7 @@
 {
   "lang":"en_GB",
   "name":"Twitchy Doctor",
+  "start_url":"/",
   "icons":[
     {
       "sizes":"any",
