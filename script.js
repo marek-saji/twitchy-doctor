@@ -95,6 +95,10 @@ fetch("/data/wikipedia-serials.html")
     fragment.append(dataSource);
     dataSource.innerHTML = html;
     Array.from(fragment.querySelectorAll(".wikiepisodetable .vevent")).forEach(tr => {
-      console.log(tr);
+      const ep = tr.children[0].id.replace(/^ep/, "");
+      const storyTitle = tr.querySelector(".summary a").textContent;
+      const episodeTitles = Array.from(tr.querySelector(".summary").childNodes)
+        .filter(ch => ch.nodeType === 
+      console.log("out", ep, storyTitle);
     });
   });
