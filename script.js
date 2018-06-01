@@ -6,9 +6,9 @@ const scheduleTsvSource = document.getElementById('schedule-raw');
 Promise.all([getScheduleData(), getWikipediaData()])
   .then(joinScheduleAndWikipediaData)
   .then(createScheduleDom)
-  .then(schedule => { document.body.appendChild(schedule); })
-  .then(() => { scheduleTsvSource.style.display = 'none'; })
-  .then(() => {
+  .then(schedule => {
+    scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
+    scheduleTsvSource.style.display = 'none';
     scrollIfNeeded();
     setInterval(scrollIfNeeded, 10 * 1000);
   });
@@ -113,7 +113,7 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
         let row = {
           start: start,
           end: end,
-          estimated: storyIdx > 0,
+          estimated: storyIdx > 0 || epIdx > 0,
           storyTitle: storyTitle,
           storyNumber: storyData.ep,
           episodeTitle: episodeTitle,
@@ -142,7 +142,7 @@ function createScheduleDom (data) {
 
     d.className = 'schedule__time';
     d.textContent = start.toLocaleString().replace(/:00$/, "");
-    if (estimated) d.textContent += " or a bit later"; // FIXME
+    if (estimated) d.textContent += " or a bit later"; // FIXME Better UI
     d.datetime = start.toISOString();
 
     t.className = 'schedule__title';
@@ -195,7 +195,7 @@ function activateNext (element, scroll) {
 }
 
 function scrollIfNeeded () {
-  const now = new Date(); // FIXME DEBUG
+  const now = new Date();
   let foundCurrent = false;
   
   for (let dateElement of document.querySelectorAll("time")) {
