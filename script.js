@@ -104,7 +104,7 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
   
   for (let scheduleRow of scheduleData) {
     let previousEnd = new Date(scheduleRow.start);
-    for (let [stdx, storyTitle] of scheduleRow.titles.entries()) {
+    for (let [storyIdx, storyTitle] of scheduleRow.titles.entries()) {
       let storyData = getStoryData(storyTitle);
       for (let [epIdx, episodeTitle] of storyData.episodes.entries()) {
         let start = new Date(previousEnd);
@@ -113,11 +113,11 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
         let row = {
           start: start,
           end: end,
-          estimated: idx > 0,
+          estimated: storyIdx > 0,
           storyTitle: storyTitle,
           storyNumber: storyData.ep,
           episodeTitle: episodeTitle,
-          episodeNumber: idx + 1,
+          episodeNumber: epIdx + 1,
           episodeTotal: storyData.episodes.length,
         };
         data.push(row);
@@ -136,7 +136,7 @@ function createScheduleDom (data) {
     const {start, end, estimated, storyTitle, episodeTitle, episodeTotal} = row;
     const item = document.createElement('li');
     const d = document.createElement('time');
-    const t = document.createElement('div');
+    const t = document.createElement('a');
 
     item.className = 'schedule__item';
 
@@ -154,6 +154,9 @@ function createScheduleDom (data) {
     {
       t.textContent = `${storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${episodeTitle}`;
     }
+    t.target = "_blank";
+    t.rel = "noopener noreferer";
+    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
 
     // TODO Link to Wikipedia
     // TODO Which doctor?
