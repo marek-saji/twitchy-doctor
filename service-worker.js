@@ -1,25 +1,28 @@
+// Bootstrap cache
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('complete').then(cache =>
-      cache.addAll([
+    caches.open('complete').then(cache => {
+      return cache.addAll([
         '/style.css',
         '/script.js',
         '/',
         '/data/wikipedia-serials.html',
       ])
-    )
+    })
   );
 });
 
+// Try network, fallback to cache
+// Cache every request
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.open('complete').then(cache =>
-      fetch(event.request)
+    caches.open('complete').then(cache => {
+      return fetch(event.request)
         .then(response => {
           cache.put(event.request, response.clone());
           return response || caches.match(event.request);
         })
         .catch(() => caches.match(event.request))
-    )
+    })
   );
 });
