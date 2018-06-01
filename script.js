@@ -71,20 +71,44 @@ function getWikipediaData () {
     });
 }
 
+function normalize (title) {
+  return title
+    .toLowerCase()
+    .replace(/the |doctor who and /g, "")
+    .replace("æ", "ae");
+}
+
+function getStoryWikipediaData (wikipediaData, storyTitle) {
+  // FIXME False negatives:
+  // The Sunmakers
+  // K9 And Company
+  // The Trial Of A Time Lord
+  const normalizedStoryTitle = normalize(storyTitle);
+  for (let storyData of wikipediaData) {
+    if (normalize(storyData.storyTitle) === normalizedStoryTitle) {
+      return storyData;
+    }
+  }
+  return;
+}
+
 function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
   const data = [];
+  const getStoryData = getStoryWikipediaData.bind(null, wikipediaData);
   
   for (let scheduleRow of scheduleData) {
-    for (let [idx, title] of scheduleRow.titles.entries()) {
+    for (let [idx, storyTitle] of scheduleRow.titles.entries()) {
+      // FIXME multiply by number of episodes
       let start = new Date(scheduleRow.start);
       start.setMinutes(start.getMinutes() + idx * EP_DURATION_MIN);
       let end = new Date(start);
       end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
+      let wikipediaData = 
       let row = {
         start: start,
         end: end,
         estimated: idx > 0,
-        title: title,
+        title: storyTitle,
       };
       data.push(row);
     
@@ -132,7 +156,7 @@ function createScheduleDom (data) {
 //   for (let i in scheduleData) {
 //     i = parseInt(i, 10);
 //     // FIXME Match last
-//     if (scheduleData[i].start < now && scheduleData[i+1] && now < scheduleData[i+1].start)
+//     if (scheduleData[i].start < now && now < scheduleData[i].end)
 //     {
 //       Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
 //       scheduleData[i].item.dataset.current = 'true';
