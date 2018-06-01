@@ -88,9 +88,13 @@ fetch("/data/wikipedia-serials.html")
   .then(response => response.text())
   .then(html => {
     const fragment = document.createDocumentFragment();
-    fragment.innerHTML = html;
-  window.foo = fragment;
-    Array.from(fragment.querySelectorAll(".wikiepisodetable")).forEach(table => {
-      console.log(table);
+    const dataSource = document.createElement("div");
+    // const base = document.createElement("base");
+    // base.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963%E2%80%931989)";
+    // fragment.append(base);
+    fragment.append(dataSource);
+    dataSource.innerHTML = html;
+    Array.from(fragment.querySelectorAll(".wikiepisodetable .vevent")).forEach(tr => {
+      console.log(tr);
     });
   });
