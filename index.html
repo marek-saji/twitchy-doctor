@@ -13,6 +13,11 @@
     </script>
     <link rel="stylesheet" href="/style.css">
     <script src="/script.js" defer></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js');
+      }
+    </script>
   </head>  
   <body>
     <!-- FIXME muted=false does not seem to be working -->
