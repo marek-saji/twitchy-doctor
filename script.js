@@ -79,17 +79,19 @@ function normalize (title) {
 }
 
 function getStoryWikipediaData (wikipediaData, storyTitle) {
-  // FIXME False negatives:
-  // The Sunmakers
-  // K9 And Company
-  // The Trial Of A Time Lord
   const normalizedStoryTitle = normalize(storyTitle);
   for (let storyData of wikipediaData) {
     if (normalize(storyData.storyTitle) === normalizedStoryTitle) {
       return storyData;
     }
   }
-  return;
+  // FIXME Remove this dummy values when false negatives get resoled:
+  // The Sunmakers
+  // K9 And Company
+  // The Trial Of A Time Lord
+  return {
+    episodes: [storyTitle],
+  };
 }
 
 function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
@@ -97,21 +99,24 @@ function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
   const getStoryData = getStoryWikipediaData.bind(null, wikipediaData);
   
   for (let scheduleRow of scheduleData) {
+    let previousEnd = new Date(scheduleRow.start);
     for (let [idx, storyTitle] of scheduleRow.titles.entries()) {
-      // FIXME multiply by number of episodes
-      let start = new Date(scheduleRow.start);
-      start.setMinutes(start.getMinutes() + idx * EP_DURATION_MIN);
-      let end = new Date(start);
-      end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
-      let wikipediaData = 
-      let row = {
-        start: start,
-        end: end,
-        estimated: idx > 0,
-        title: storyTitle,
-      };
-      data.push(row);
-    
+      let storyData = getStoryData(storyTitle);
+      for (let episodeTitle of storyData.episodes) {
+        let start = new Date(previousEnd);
+        let end = new Date(start);
+        end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
+        let row = {
+          start: start,
+          end: end,
+          estimated: idx > 0,
+          storyTitle: storyTitle,
+          episodeTitle: episodeTitle,
+          // TODO episodeNo, episodeTotal, storyNo
+        };
+        data.push(row);
+        previousEnd = end;
+      }
     }
   }
   
@@ -123,7 +128,7 @@ function createScheduleDom (data) {
   console.log(data[0], data[1]);
   schedule.className = 'schedule';
   data.forEach(row => {
-    const {start, titles, title, estimated} = row;
+    const {start, end, estimated, storyTitle, episodeTitle} = row;
     const item = document.createElement('li');
     const d = document.createElement('time');
     const t = document.createElement('div');
@@ -136,7 +141,7 @@ function createScheduleDom (data) {
     d.datetime = start.toISOString();
 
     t.className = 'schedule__title';
-    t.textContent = title || titles.join(", ");
+    t.textContent = storyTitle + ": " + episodeTitle;
 
     // TODO Link to Wikipedia
     // TODO Which doctor?
