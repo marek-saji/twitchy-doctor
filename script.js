@@ -173,7 +173,6 @@ function scrollTo (element) {
     block: "start",
     behaviour: "smooth",
   });
-  console.log(element);
 }
 
 function activateCurrent (element) {

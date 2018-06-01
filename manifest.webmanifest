@@ -7,6 +7,11 @@
       "sizes":"any",
       "type":"image/svg+xml",
       "src":"https://cdn.glitch.com/ce23eaf7-7bcd-4453-84f3-aea00163381d%2Ftardis-2311634.svg?1527808227377"
+    },
+    {
+      "sizes": "512x512",
+      "type": "image/png",
+      "src": "https://cdn.glitch.com/ce23eaf7-7bcd-4453-84f3-aea00163381d%2Fd9lPF5zjM.png?1527864652556"
     }
   ],
   "display":"standalone",
