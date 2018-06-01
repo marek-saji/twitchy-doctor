@@ -168,7 +168,8 @@ function deactivateOther () {
 }
 
 function scrollTo (element) {
-  element.scrollIntoView({
+  // FIXME Scroll only on change
+  element.scrollIntoViewIfNeeded({
     block: "start",
     behaviour: "smooth",
   });
@@ -204,21 +205,4 @@ function scrollIfNeeded () {
       return;
     }
   }
-  
-  // for (let i in scheduleData) {
-  //   i = parseInt(i, 10);
-  //   // FIXME Match last
-  //   if (scheduleData[i].start < now && now < scheduleData[i].end)
-  //   {
-  //     Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
-  //     scheduleData[i].item.dataset.current = 'true';
-  //     // TODO Only if needed
-  //     // TODO Animate
-  //     // FIXME Broken on iOS?
-  //     scheduleData[i].item.scrollIntoView({
-  //       block: "start",
-  //       behaviour: "smooth",
-  //     });
-  //     break;
-  //   }
 }

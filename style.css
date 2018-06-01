@@ -25,8 +25,12 @@ iframe {
   padding: 0.5em 1em;
 }
 
-.schedule__item[data-current=true] {
+.schedule__item[data-state="current"] {
   background-color: Highlight;
+}
+
+.schedule__item[data-state="next"] {
+  border-top: Highlight solid;
 }
 
 .schedule__time {
