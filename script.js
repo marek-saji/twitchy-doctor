@@ -6,9 +6,9 @@ Promise.all([getScheduleData(), getWikipediaData()])
   .then(joinScheduleAndWikipediaData)
   .then(createScheduleDom)
   .then(schedule => { document.body.appendChild(schedule); })
-  .then(() => { scheduleTsvSource.style.display = 'none'; });
+  .then(() => { scheduleTsvSource.style.display = 'none'; })
+  .then(() => { scrollIfNeeded(); });
 
-scrollIfNeeded();
 // setInterval(scrollIfNeeded, 10 * 1000);
 
 function getScheduleData () {
@@ -164,20 +164,19 @@ function createScheduleDom (data) {
 }
 
 function scrollIfNeeded () {
-  const now = new Date();
-  const end = new Date(now);
-  end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
-  const nowString = now.toISOString();
-  const endString = end.toISOString();
+  const now = new Date('2018-05-29T19:20'); // FIXME DEBUG
   
-  console.log("", nowString, endString);
   Array.from(document.querySelectorAll("[data-current=true]")).forEach(e => { delete e.dataset.current; });
-  for (let dateElement of document.querySelectorAll("time"))
-  {
-    if (dateElement.datetime < nowString && endString < dateElement.datetime)
-    {
-      console.log(dateElement.parent);
+  
+  for (let dateElement of document.querySelectorAll("time")) {
+    let start = new Date(dateElement.datetime);
+    let end = new Date(start);
+    end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
+    if (start <= now && now <= end) {
+      activate(dataElement.parentElement);
+      break;
     }
+    // FIXME With no perfect match, scroll to closest.
   }
   
   // for (let i in scheduleData) {
