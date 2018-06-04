@@ -2,16 +2,25 @@ const EP_DURATION_MIN = 25;
 
 const scheduleTsvSource = document.getElementById('schedule-raw');
 
+(async function () {
+  const [scheduleData, wikipediaData] = Promise.all([getScheduleData(), getWikipediaData()]);
+  const data = await joinScheduleAndWikipediaData(scheduleData, wikipediaData);
+  const schedule = await createScheduleDom(data);
+  scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
+  scheduleTsvSource.style.display = 'none';
+  scrollIfNeeded();
+  setInterval(scrollIfNeeded, 10 * 1000);
+}());
 
-Promise.all([getScheduleData(), getWikipediaData()])
-  .then(joinScheduleAndWikipediaData)
-  .then(createScheduleDom)
-  .then(schedule => {
-    scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
-    scheduleTsvSource.style.display = 'none';
-    scrollIfNeeded();
-    setInterval(scrollIfNeeded, 10 * 1000);
-  });
+// Promise.all([getScheduleData(), getWikipediaData()])
+//   .then(joinScheduleAndWikipediaData)
+//   .then(createScheduleDom)
+//   .then(schedule => {
+//     scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
+//     scheduleTsvSource.style.display = 'none';
+//     scrollIfNeeded();
+//     setInterval(scrollIfNeeded, 10 * 1000);
+//   });
 
 
 function getScheduleData () {
@@ -64,7 +73,7 @@ function getWikipediaData () {
             episodes.push(storyTitle);
           }
           rows.push({
-            ep,
+            ep,Array.from
             storyTitle,
             episodes,
           });
@@ -171,7 +180,9 @@ function createScheduleDom (data) {
 }
 
 function deactivateOther () {
-    Array.from(document.querySelectorAll("[data-state]")).forEach(e => { delete e.dataset.current; });
+  for (let e of document.querySelectorAll("[data-state]")) {
+    delete e.dataset.state;
+  }
 }
 
 function scrollTo (element) {
