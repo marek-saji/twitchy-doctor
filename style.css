@@ -18,10 +18,14 @@ body {
   overflow: scroll;
 }
 
-.schedule {
+.schedule,
+.schedule__list {
   margin: 0;
   padding: 0;
 }
+
+.schedule__header {
+  
 
 .schedule__item {
   list-style: none;

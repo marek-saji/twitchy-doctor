@@ -140,57 +140,70 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
   return data;
 }
 
+function createHeaderElement (heading) {
+  const item = document.createElement('h2');
+  item.className = 'schedule__heading';
+  item.textContent = heading;
+  return item;
+}
+
+function createItemElement (row) {
+  const item = document.createElement('li');
+  const d = document.createElement('time');
+  const t = document.createElement('a');
+
+  item.className = 'schedule__item';
+
+  d.className = 'schedule__time';
+  d.textContent = row.start.toLocaleString().replace(/:00$/, "");
+  if (row.estimated) d.textContent += " or a bit later"; // FIXME Better UI
+  d.datetime = row.start.toISOString();
+
+  t.className = 'schedule__title';
+  if (1 === row.episodeTotal)
+  {
+    t.textContent = row.storyTitle;
+  }
+  else if (normalize(row.storyTitle) === normalize(row.episodeTitle))
+  {
+    t.textContent = `${row.storyTitle} (${row.episodeNumber}/${row.episodeTotal})`;
+  }
+  else
+  {
+    t.textContent = `${row.storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${row.episodeTitle}`;
+  }
+  t.target = "_blank";
+  t.rel = "noopener noreferrer";
+  t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
+
+  item.append(d);
+  item.append(t);
+  
+  return item;
+}
+
 function createScheduleDom (data) {
-  const schedule = document.createElement('ol');
+  const schedule = document.createElement('section');
+  let list;
   let prevDoctor;
   schedule.className = 'schedule';
   for (let i = 0; i < data.length; i += 1) {
-    const {start, end, estimated, doctor, storyTitle, storyNumber, episodeTitle, episodeNumber, episodeTotal} = data[i];
+    const row = data[i];
+    const item = createItemElement(row);
     
     // FIXME. Bad HTML structure. Ugly JS.
-    if (prevDoctor !== doctor) {
-      const item = document.createElement('h2');
-      item.textContent = doctor;
-      schedule.append(item);
+    if (prevDoctor !== row.doctor) {
+      schedule.appendChild(createHeaderElement(row.doctor));
+      list = document.createElement('ol');
+      list.className = 'schedule__list';
+      schedule.appendChild(list);
     }
     
-    const item = document.createElement('li');
-    const d = document.createElement('time');
-    const t = document.createElement('a');
-
-    item.className = 'schedule__item';
-
-    d.className = 'schedule__time';
-    d.textContent = start.toLocaleString().replace(/:00$/, "");
-    if (estimated) d.textContent += " or a bit later"; // FIXME Better UI
-    d.datetime = start.toISOString();
-
-    t.className = 'schedule__title';
-    if (1 === episodeTotal)
-    {
-      t.textContent = storyTitle;
-    }
-    else if (normalize(storyTitle) === normalize(episodeTitle))
-    {
-      t.textContent = `${storyTitle} (${episodeNumber}/${episodeTotal})`;
-    }
-    else
-    {
-      t.textContent = `${storyTitle} (${episodeNumber}/${episodeTotal}): ${episodeTitle}`;
-    }
-    t.target = "_blank";
-    t.rel = "noopener noreferrer";
-    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + storyNumber;
-
-    // TODO Which doctor?
-
-    item.append(d);
-    item.append(t);
-    schedule.append(item);
+    list.appendChild(item);
 
     data[i].item = item;
     
-    prevDoctor = doctor;
+    prevDoctor = row.doctor;
   };
   // TODO Button to scroll to current (visible only when current is out of sight)
   return schedule;
