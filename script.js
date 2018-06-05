@@ -3,7 +3,7 @@ const EP_DURATION_MIN = 25;
 const scheduleTsvSource = document.getElementById('schedule-raw');
 
 (async function () {
-  const [scheduleData, wikipediaData] = Promise.all([getScheduleData(), getWikipediaData()]);
+  const [scheduleData, wikipediaData] = await Promise.all([getScheduleData(), getWikipediaData()]);
   const data = await joinScheduleAndWikipediaData(scheduleData, wikipediaData);
   const schedule = await createScheduleDom(data);
   scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
@@ -11,16 +11,6 @@ const scheduleTsvSource = document.getElementById('schedule-raw');
   scrollIfNeeded();
   setInterval(scrollIfNeeded, 10 * 1000);
 }());
-
-// Promise.all([getScheduleData(), getWikipediaData()])
-//   .then(joinScheduleAndWikipediaData)
-//   .then(createScheduleDom)
-//   .then(schedule => {
-//     scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
-//     scheduleTsvSource.style.display = 'none';
-//     scrollIfNeeded();
-//     setInterval(scrollIfNeeded, 10 * 1000);
-//   });
 
 
 function getScheduleData () {
@@ -73,7 +63,7 @@ function getWikipediaData () {
             episodes.push(storyTitle);
           }
           rows.push({
-            ep,Array.from
+            ep,
             storyTitle,
             episodes,
           });
@@ -107,7 +97,7 @@ function getStoryWikipediaData (wikipediaData, storyTitle) {
   };
 }
 
-function joinScheduleAndWikipediaData ([scheduleData, wikipediaData]) {
+function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
   const data = [];
   const getStoryData = getStoryWikipediaData.bind(null, wikipediaData);
   
