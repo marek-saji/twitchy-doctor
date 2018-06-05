@@ -53,7 +53,10 @@ async function getWikipediaData () {
   for (let tr of dataSource.querySelectorAll(".wikiepisodetable .vevent")) {
     const ep = tr.children[0].id.replace(/^ep/, "");
     const storyTitle = tr.querySelector(".summary a").textContent;
-    let episodes = Array.from(tr.querySelector(".summary").childNodes)
+    let episodes;
+    let doctorHeading;
+    
+    episodes = Array.from(tr.querySelector(".summary").childNodes)
       .filter(ch => ch instanceof Text)
       .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
     if (0 === episodes.length)
@@ -63,8 +66,16 @@ async function getWikipediaData () {
         .filter(n => n instanceof Text)
         .map(textNode => storyTitle);
     }
+    
+    for (
+      doctorHeading = tr.closest('table');
+      doctorHeading.tagName !== 'H3';
+      doctorHeading = doctorHeading.previousElementSibling
+    );
+    
     data.push({
       ep,
+      doctor,
       storyTitle,
       episodes,
     });
@@ -112,6 +123,7 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
           start: start,
           end: end,
           estimated: storyIdx > 0 || epIdx > 0,
+          doctor: storyData.doctor,
           storyTitle: storyTitle,
           storyNumber: storyData.ep,
           episodeTitle: episodeTitle,
