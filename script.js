@@ -54,11 +54,13 @@ async function getWikipediaData () {
     const ep = tr.children[0].id.replace(/^ep/, "");
     const storyTitle = tr.querySelector(".summary a").textContent;
     let episodes;
+    let missingEpisodes;
     let doctorHeading;
     
     episodes = Array.from(tr.querySelector(".summary").childNodes)
       .filter(ch => ch instanceof Text)
-      .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
+      .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""))
+      .filter(text => ! /^\s*\(.*\)\s*$/.test(text));
     if (0 === episodes.length)
     {
       // FIXME The Ice Warriors shows just one
@@ -66,6 +68,9 @@ async function getWikipediaData () {
       episodes = Array.from(tr.children[5].childNodes)
         .filter(n => n instanceof Text)
         .map(textNode => storyTitle);
+    }
+    
+    if (let match = tr.querySelector(".summary").textContent.match(/\(episodes? ([0-9, &\s]) missing\)/i)) {
     }
     
     for (
@@ -142,7 +147,7 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
 
 function createHeaderElement (heading) {
   const item = document.createElement('h2');
-  item.className = 'schedule__heading';
+  item.className = 'schedule__header';
   item.textContent = heading;
   return item;
 }
@@ -185,14 +190,12 @@ function createItemElement (row) {
 function createScheduleDom (data) {
   const schedule = document.createElement('section');
   let list;
-  let prevDoctor;
   schedule.className = 'schedule';
   for (let i = 0; i < data.length; i += 1) {
     const row = data[i];
     const item = createItemElement(row);
     
-    // FIXME. Bad HTML structure. Ugly JS.
-    if (prevDoctor !== row.doctor) {
+    if (0 === i || data[i-1].doctor !== row.doctor) {
       schedule.appendChild(createHeaderElement(row.doctor));
       list = document.createElement('ol');
       list.className = 'schedule__list';
@@ -202,8 +205,6 @@ function createScheduleDom (data) {
     list.appendChild(item);
 
     data[i].item = item;
-    
-    prevDoctor = row.doctor;
   };
   // TODO Button to scroll to current (visible only when current is out of sight)
   return schedule;
@@ -224,13 +225,10 @@ function activateNext (element, scroll) {
 }
 
 function scrollTo (element) {
-  setTimeout(() => {
-  // FIXME Scroll only on change
   element.scrollIntoViewIfNeeded({
     block: "start",
     behaviour: "smooth",
   });
-  }, 300);
 }
 
 function scrollIfNeeded () {
