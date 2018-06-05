@@ -8,8 +8,10 @@ const scheduleTsvSource = document.getElementById('schedule-raw');
   const schedule = await createScheduleDom(data);
   scheduleTsvSource.parentElement.insertBefore(schedule, scheduleTsvSource);
   scheduleTsvSource.style.display = 'none';
-  scrollIfNeeded();
-  setInterval(scrollIfNeeded, 10 * 1000);
+  window.addEventListener('load', () => {
+    scrollIfNeeded();
+    setInterval(scrollIfNeeded, 10 * 1000);
+  });
 }());
 
 
@@ -31,7 +33,6 @@ function getScheduleData () {
         // FIXME Wtf? -1?!
         d.setHours(parseInt(h, 10) - d.getTimezoneOffset() / 60 - 1);
         d.setMinutes(parseInt(m, 10));
-        // FIXME one row per title, if I can get episode duration from somewhere
         rows.push({
           start: d,
           titles: titles,
@@ -48,9 +49,7 @@ async function getWikipediaData () {
   const dataSource = document.createElement("div");
   // Dummy way to disable loading images.
   dataSource.innerHTML = html.replace(/<img /g, '<x-img ');
-  
-  dataSource.innerHTML = html;
-  
+    
   for (let tr of dataSource.querySelectorAll(".wikiepisodetable .vevent")) {
     const ep = tr.children[0].id.replace(/^ep/, "");
     const storyTitle = tr.querySelector(".summary a").textContent;
@@ -73,40 +72,6 @@ async function getWikipediaData () {
   
   return data;
 }
-
-// function getWikipediaData () {
-//   return fetch("/data/wikipedia-serials.html")
-//     .then(response => response.text())
-//     // Dummy way to disable loading images.
-//     .then(html => html.replace(/<img /g, '<x-img '))
-//     .then(html => {
-//       const dataSource = document.createElement("div");
-//       dataSource.innerHTML = html;
-//       return Array.from(dataSource.querySelectorAll(".wikiepisodetable .vevent")).reduce(
-//         (rows, tr) => {
-//           const ep = tr.children[0].id.replace(/^ep/, "");
-//           const storyTitle = tr.querySelector(".summary a").textContent;
-//           let episodes = Array.from(tr.querySelector(".summary").childNodes)
-//             .filter(ch => ch instanceof Text)
-//             .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
-//           if (0 === episodes.length)
-//           {
-//             // As many episodes as broadcast dates
-//             episodes = Array.from(tr.children[5].childNodes)
-//               .filter(n => n instanceof Text)
-//               .map(textNode => storyTitle);
-//           }
-//           rows.push({
-//             ep,
-//             storyTitle,
-//             episodes,
-//           });
-//           return rows;
-//         },
-//         []
-//       );
-//     });
-// }
 
 function normalize (title) {
   return title
@@ -191,7 +156,6 @@ function createScheduleDom (data) {
     t.rel = "noopener noreferrer";
     t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
 
-    // TODO Link to Wikipedia
     // TODO Which doctor?
 
     item.append(d);
@@ -219,15 +183,17 @@ function activateNext (element, scroll) {
 }
 
 function scrollTo (element) {
-  console.log(element);
+  setTimeout(() => {
   // FIXME Scroll only on change
   element.scrollIntoViewIfNeeded({
     block: "start",
     behaviour: "smooth",
   });
+  }, 300);
 }
 
 function scrollIfNeeded () {
+  const oldCurrent = document.querySelector("[data-state=current], [data-state=next]");
   const now = new Date();
   let scrollTarget;
   
@@ -249,13 +215,8 @@ function scrollIfNeeded () {
   }
   
   if (scrollTarget) {
-    const oldCurrent = document.querySelector("[data-state=current]");
     if (scrollTarget !== oldCurrent) {
-      console.log('scrolling to', scrollTarget);
       scrollTo(scrollTarget);
-    }
-    else {
-      console.log('not scrolling.', scrollTarget, 'is still current');
     }
   }
 }
