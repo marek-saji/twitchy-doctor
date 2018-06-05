@@ -42,8 +42,8 @@ function getScheduleData () {
     }, []);
 }
 
-function getWikipediaData () {
-  return fetch("/data/wikipedia-serials.html")
+async function getWikipediaData () {
+  const html = (await fetch("/data/wikipedia-serials.html")).text();
     .then(response => response.text())
     // Dummy way to disable loading images.
     .then(html => html.replace(/<img /g, '<x-img '))
@@ -75,6 +75,39 @@ function getWikipediaData () {
       );
     });
 }
+// function getWikipediaData () {
+//   return fetch("/data/wikipedia-serials.html")
+//     .then(response => response.text())
+//     // Dummy way to disable loading images.
+//     .then(html => html.replace(/<img /g, '<x-img '))
+//     .then(html => {
+//       const dataSource = document.createElement("div");
+//       dataSource.innerHTML = html;
+//       return Array.from(dataSource.querySelectorAll(".wikiepisodetable .vevent")).reduce(
+//         (rows, tr) => {
+//           const ep = tr.children[0].id.replace(/^ep/, "");
+//           const storyTitle = tr.querySelector(".summary a").textContent;
+//           let episodes = Array.from(tr.querySelector(".summary").childNodes)
+//             .filter(ch => ch instanceof Text)
+//             .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
+//           if (0 === episodes.length)
+//           {
+//             // As many episodes as broadcast dates
+//             episodes = Array.from(tr.children[5].childNodes)
+//               .filter(n => n instanceof Text)
+//               .map(textNode => storyTitle);
+//           }
+//           rows.push({
+//             ep,
+//             storyTitle,
+//             episodes,
+//           });
+//           return rows;
+//         },
+//         []
+//       );
+//     });
+// }
 
 function normalize (title) {
   return title
