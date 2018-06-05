@@ -75,7 +75,7 @@ async function getWikipediaData () {
     
     data.push({
       ep,
-      doctor,
+      doctor: doctorHeading.childNodes[0].textContent,
       storyTitle,
       episodes,
     });
@@ -141,9 +141,10 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
 
 function createScheduleDom (data) {
   const schedule = document.createElement('ol');
+  let prevDoctor;
   schedule.className = 'schedule';
-  data.forEach(row => {
-    const {start, end, estimated, storyTitle, episodeTitle, episodeTotal} = row;
+  for (let i = 0; i < data.length; i += 1) {
+    const {start, end, estimated, doctor, storyTitle, storyNumber, episodeTitle, episodeNumber, episodeTotal} = data[i];
     const item = document.createElement('li');
     const d = document.createElement('time');
     const t = document.createElement('a');
@@ -162,11 +163,11 @@ function createScheduleDom (data) {
     }
     else
     {
-      t.textContent = `${storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${episodeTitle}`;
+      t.textContent = `${storyTitle} (${episodeNumber}/${episodeTotal}): ${episodeTitle}`;
     }
     t.target = "_blank";
     t.rel = "noopener noreferrer";
-    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
+    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + storyNumber;
 
     // TODO Which doctor?
 
@@ -175,7 +176,7 @@ function createScheduleDom (data) {
     schedule.append(item);
 
     row.item = item;
-  });
+  };
   // TODO Button to scroll to current (visible only when current is out of sight)
   return schedule;
 }
