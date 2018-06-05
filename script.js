@@ -54,7 +54,6 @@ async function getWikipediaData () {
     const ep = tr.children[0].id.replace(/^ep/, "");
     const storyTitle = tr.querySelector(".summary a").textContent;
     let episodes;
-    let missingEpisodes;
     let doctorHeading;
     
     episodes = Array.from(tr.querySelector(".summary").childNodes)
@@ -70,7 +69,17 @@ async function getWikipediaData () {
         .map(textNode => storyTitle);
     }
     
-    if (let match = tr.querySelector(".summary").textContent.match(/\(episodes? ([0-9, &\s]) missing\)/i)) {
+    episodes = episodes.map(title => { return {title} });
+
+    if (tr.querySelector(".summary").textContent.match(/\(all episodes missing\)/i)) {
+      episodes.forEach(ep => { ep.missing = true });
+    }
+    else
+    {
+      let match = tr.querySelector(".summary").textContent.match(/\(episodes? ([0-9, &\s]*) missing\)/i);
+      if (match) {
+        match[1].split(/[^0-9]+/).forEach(ep => { episodes[ep-1].missing = true });
+      }
     }
     
     for (
@@ -177,6 +186,7 @@ function createItemElement (row) {
   {
     t.textContent = `${row.storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${row.episodeTitle}`;
   }
+  if (row.missing) t.textContent += ' (MISSING)';
   t.target = "_blank";
   t.rel = "noopener noreferrer";
   t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
