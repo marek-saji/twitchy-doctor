@@ -43,38 +43,37 @@ function getScheduleData () {
 }
 
 async function getWikipediaData () {
-  const html = (await fetch("/data/wikipedia-serials.html")).text();
-    .then(response => response.text())
-    // Dummy way to disable loading images.
-    .then(html => html.replace(/<img /g, '<x-img '))
-    .then(html => {
-      const dataSource = document.createElement("div");
-      dataSource.innerHTML = html;
-      return Array.from(dataSource.querySelectorAll(".wikiepisodetable .vevent")).reduce(
-        (rows, tr) => {
-          const ep = tr.children[0].id.replace(/^ep/, "");
-          const storyTitle = tr.querySelector(".summary a").textContent;
-          let episodes = Array.from(tr.querySelector(".summary").childNodes)
-            .filter(ch => ch instanceof Text)
-            .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
-          if (0 === episodes.length)
-          {
-            // As many episodes as broadcast dates
-            episodes = Array.from(tr.children[5].childNodes)
-              .filter(n => n instanceof Text)
-              .map(textNode => storyTitle);
-          }
-          rows.push({
-            ep,
-            storyTitle,
-            episodes,
-          });
-          return rows;
-        },
-        []
-      );
+  const data = [];
+  const html = await (await fetch("/data/wikipedia-serials.html")).text();
+  const dataSource = document.createElement("div");
+  // Dummy way to disable loading images.
+  dataSource.innerHTML = html.replace(/<img /g, '<x-img ');
+  
+  dataSource.innerHTML = html;
+  
+  for (let tr of dataSource.querySelectorAll(".wikiepisodetable .vevent")) {
+    const ep = tr.children[0].id.replace(/^ep/, "");
+    const storyTitle = tr.querySelector(".summary a").textContent;
+    let episodes = Array.from(tr.querySelector(".summary").childNodes)
+      .filter(ch => ch instanceof Text)
+      .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
+    if (0 === episodes.length)
+    {
+      // As many episodes as broadcast dates
+      episodes = Array.from(tr.children[5].childNodes)
+        .filter(n => n instanceof Text)
+        .map(textNode => storyTitle);
+    }
+    data.push({
+      ep,
+      storyTitle,
+      episodes,
     });
+  }
+  
+  return data;
 }
+
 // function getWikipediaData () {
 //   return fetch("/data/wikipedia-serials.html")
 //     .then(response => response.text())
@@ -220,6 +219,7 @@ function activateNext (element, scroll) {
 }
 
 function scrollTo (element) {
+  console.log(element);
   // FIXME Scroll only on change
   element.scrollIntoViewIfNeeded({
     block: "start",
@@ -229,7 +229,7 @@ function scrollTo (element) {
 
 function scrollIfNeeded () {
   const now = new Date();
-  let foundElement = false;
+  let scrollTarget;
   
   deactivateOther();
   
@@ -239,16 +239,23 @@ function scrollIfNeeded () {
     end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
     if (start <= now && now <= end) {
       activateCurrent(dateElement.parentElement);
-      foundElement = dateElement.parentElement;
+      scrollTarget = dateElement.parentElement;
     }
     else if (now < start) {
       activateNext(dateElement.parentElement);
-      foundElement = dateElement.parentElement;
+      scrollTarget = dateElement.parentElement;
       break;
     }
   }
   
-  if (foundElement) {
-    scrollTo(foundElement);
+  if (scrollTarget) {
+    const oldCurrent = document.querySelector("[data-state=current]");
+    if (scrollTarget !== oldCurrent) {
+      console.log('scrolling to', scrollTarget);
+      scrollTo(scrollTarget);
+    }
+    else {
+      console.log('not scrolling.', scrollTarget, 'is still current');
+    }
   }
 }
