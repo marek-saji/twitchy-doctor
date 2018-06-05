@@ -168,6 +168,7 @@ function createScheduleDom (data) {
 
     row.item = item;
   });
+  // TODO Button to scroll to current (visible only when current is out of sight)
   return schedule;
 }
 
