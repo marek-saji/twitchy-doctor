@@ -54,13 +54,15 @@ function getWikipediaData () {
         (rows, tr) => {
           const ep = tr.children[0].id.replace(/^ep/, "");
           const storyTitle = tr.querySelector(".summary a").textContent;
-          // FIXME Later episodes do not get unique titles
-          const episodes = Array.from(tr.querySelector(".summary").childNodes)
+          let episodes = Array.from(tr.querySelector(".summary").childNodes)
             .filter(ch => ch instanceof Text)
             .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
           if (0 === episodes.length)
           {
-            episodes.push(storyTitle);
+            // As many episodes as broadcast dates
+            episodes = Array.from(tr.children[5].childNodes)
+              .filter(n => n instanceof Text)
+              .map(textNode => storyTitle);
           }
           rows.push({
             ep,
