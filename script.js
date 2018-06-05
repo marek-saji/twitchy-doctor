@@ -62,7 +62,6 @@ async function getWikipediaData () {
       .filter(text => ! /^\s*\(.*\)\s*$/.test(text));
     if (0 === episodes.length)
     {
-      // FIXME The Ice Warriors shows just one
       // As many episodes as broadcast dates
       episodes = Array.from(tr.children[5].childNodes)
         .filter(n => n instanceof Text)
@@ -103,6 +102,7 @@ function normalize (title) {
   return title
     .toLowerCase()
     .replace(/the |doctor who and /g, "")
+    .replace(/sun makers/, 'sunmakers')
     .replace("æ", "ae");
 }
 
@@ -130,7 +130,7 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
     let previousEnd = new Date(scheduleRow.start);
     for (let [storyIdx, storyTitle] of scheduleRow.titles.entries()) {
       let storyData = getStoryData(storyTitle);
-      for (let [epIdx, episodeTitle] of storyData.episodes.entries()) {
+      for (let [epIdx, episodeData] of storyData.episodes.entries()) {
         let start = new Date(previousEnd);
         let end = new Date(start);
         end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
@@ -141,7 +141,8 @@ function joinScheduleAndWikipediaData (scheduleData, wikipediaData) {
           doctor: storyData.doctor,
           storyTitle: storyTitle,
           storyNumber: storyData.ep,
-          episodeTitle: episodeTitle,
+          episodeTitle: episodeData.title,
+          missing: episodeData.missing,
           episodeNumber: epIdx + 1,
           episodeTotal: storyData.episodes.length,
         };
@@ -186,10 +187,15 @@ function createItemElement (row) {
   {
     t.textContent = `${row.storyTitle} (${row.episodeNumber}/${row.episodeTotal}): ${row.episodeTitle}`;
   }
-  if (row.missing) t.textContent += ' (MISSING)';
+  if (row.missing) t.textContent += ' (missing?)';
   t.target = "_blank";
   t.rel = "noopener noreferrer";
-  t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
+  if (row.storyNumber) {
+    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
+  }
+  else {
+    t.href = "https://google.com/search?q=doctor who " + row.episodeTitle;
+  }
 
   item.append(d);
   item.append(t);
