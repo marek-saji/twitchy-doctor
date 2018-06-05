@@ -114,9 +114,7 @@ function getStoryWikipediaData (wikipediaData, storyTitle) {
     }
   }
   // FIXME Remove this dummy values when false negatives get resoled:
-  // The Sunmakers
-  // K9 And Company
-  // The Trial Of A Time Lord
+  // The Trial Of A Time Lord → The Mysterious Planet … The Ultimate Foe
   return {
     episodes: [storyTitle],
   };
@@ -194,7 +192,9 @@ function createItemElement (row) {
     t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
   }
   else {
-    t.href = "https://google.com/search?q=doctor who " + row.episodeTitle;
+    let url = new URL('https://google.com/search');
+    url.searchParams.set('q', `doctor who ${row.storyTitle || row.storyTitle}`);
+    t.href = url.toString();
   }
 
   item.append(d);
