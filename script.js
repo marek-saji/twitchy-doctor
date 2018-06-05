@@ -169,10 +169,18 @@ function createScheduleDom (data) {
   return schedule;
 }
 
-function deactivateOther () {
+function deactivateOther (foundElement) {
   for (let e of document.querySelectorAll("[data-state]")) {
     delete e.dataset.state;
   }
+}
+
+function activateCurrent (element) {
+  element.dataset.state = "current";
+}
+
+function activateNext (element, scroll) {
+  element.dataset.state = "next";
 }
 
 function scrollTo (element) {
@@ -183,21 +191,11 @@ function scrollTo (element) {
   });
 }
 
-function activateCurrent (element) {
-  deactivateOther();
-  element.dataset.state = "current";
-  scrollTo(element);
-}
-
-function activateNext (element, scroll) {
-  deactivateOther();
-  element.dataset.state = "next";
-  if (scroll) scrollTo(element);
-}
-
 function scrollIfNeeded () {
   const now = new Date();
-  let foundCurrent = false;
+  let foundElement = false;
+  
+  deactivateOther();
   
   for (let dateElement of document.querySelectorAll("time")) {
     let start = new Date(dateElement.datetime);
@@ -205,11 +203,16 @@ function scrollIfNeeded () {
     end.setMinutes(end.getMinutes() + EP_DURATION_MIN);
     if (start <= now && now <= end) {
       activateCurrent(dateElement.parentElement);
-      foundCurrent = true;
+      foundElement = dateElement.parentElement;
     }
     else if (now < start) {
-      activateNext(dateElement.parentElement, ! foundCurrent);
-      return;
+      activateNext(dateElement.parentElement);
+      foundElement = dateElement.parentElement;
+      break;
     }
+  }
+  
+  if (foundElement) {
+    scrollTo(foundElement);
   }
 }
