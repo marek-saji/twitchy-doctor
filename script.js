@@ -61,6 +61,7 @@ async function getWikipediaData () {
       .map(textNode => textNode.textContent.replace(/^\s*"|"\s*$/g, ""));
     if (0 === episodes.length)
     {
+      // FIXME The Ice Warriors shows just one
       // As many episodes as broadcast dates
       episodes = Array.from(tr.children[5].childNodes)
         .filter(n => n instanceof Text)
@@ -145,6 +146,14 @@ function createScheduleDom (data) {
   schedule.className = 'schedule';
   for (let i = 0; i < data.length; i += 1) {
     const {start, end, estimated, doctor, storyTitle, storyNumber, episodeTitle, episodeNumber, episodeTotal} = data[i];
+    
+    // FIXME. Bad HTML structure. Ugly JS.
+    if (prevDoctor !== doctor) {
+      const item = document.createElement('h2');
+      item.textContent = doctor;
+      schedule.append(item);
+    }
+    
     const item = document.createElement('li');
     const d = document.createElement('time');
     const t = document.createElement('a');
@@ -161,6 +170,10 @@ function createScheduleDom (data) {
     {
       t.textContent = storyTitle;
     }
+    else if (normalize(storyTitle) === normalize(episodeTitle))
+    {
+      t.textContent = `${storyTitle} (${episodeNumber}/${episodeTotal})`;
+    }
     else
     {
       t.textContent = `${storyTitle} (${episodeNumber}/${episodeTotal}): ${episodeTitle}`;
@@ -175,7 +188,9 @@ function createScheduleDom (data) {
     item.append(t);
     schedule.append(item);
 
-    row.item = item;
+    data[i].item = item;
+    
+    prevDoctor = doctor;
   };
   // TODO Button to scroll to current (visible only when current is out of sight)
   return schedule;
