@@ -45,7 +45,7 @@ function getScheduleData () {
 
 async function getWikipediaData () {
   const data = [];
-  const html = await (await fetch("/data/wikipedia-serials.html")).text();
+  const html = await (await fetch("data/wikipedia-serials.html")).text();
   const dataSource = document.createElement("div");
   // Dummy way to disable loading images.
   dataSource.innerHTML = html.replace(/<img /g, '<x-img ');
