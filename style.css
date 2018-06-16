@@ -24,6 +24,10 @@ body {
   padding: 0;
 }
 
+.schedule {
+  position: relative;
+}
+
 .schedule__header {
   margin: 0;
   padding: 1rem 1rem;
@@ -71,4 +75,10 @@ body {
   
   text-decoration: none;
   color: inherit;
+}
+
+.scrollToActiveButton {
+  position: fixed;
+  top: 0;
+  right: 0;
 }

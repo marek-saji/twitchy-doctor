@@ -188,14 +188,9 @@ function createItemElement (row) {
   if (row.missing) t.textContent += ' (missing?)';
   t.target = "_blank";
   t.rel = "noopener noreferrer";
-  if (row.storyNumber) {
-    t.href = "https://en.wikipedia.org/wiki/List_of_Doctor_Who_episodes_(1963–1989)#ep" + row.storyNumber;
-  }
-  else {
-    let url = new URL('https://google.com/search');
-    url.searchParams.set('q', `doctor who ${row.storyTitle || row.storyTitle}`);
-    t.href = url.toString();
-  }
+  let url = new URL('https://google.com/search?btnI=1');
+  url.searchParams.set('q', `site:en.wikipedia.org doctor who ${row.storyTitle} ${row.episodeTitle}`);
+  t.href = url.toString();
 
   item.append(d);
   item.append(t);
@@ -205,7 +200,7 @@ function createItemElement (row) {
 
 function createScheduleDom (data) {
   const schedule = document.createElement('section');
-  let list;
+  let list, scrollToActiveButton;
   schedule.className = 'schedule';
   for (let i = 0; i < data.length; i += 1) {
     const row = data[i];
@@ -222,8 +217,20 @@ function createScheduleDom (data) {
 
     data[i].item = item;
   };
-  // TODO Button to scroll to current (visible only when current is out of sight)
+  
+  scrollToActiveButton = createScrollToActiveButton();
+  schedule.prepend(scrollToActiveButton);
+  
   return schedule;
+}
+
+function createScrollToActiveButton () {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = 'Scroll to current episode';
+  button.classList.add('scrollToActiveButton');
+  
+  return button;
 }
 
 function deactivateOther (foundElement) {
