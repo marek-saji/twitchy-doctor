@@ -229,6 +229,10 @@ function createScrollToActiveButton () {
   button.type = 'button';
   button.textContent = 'Scroll to current episode';
   button.classList.add('scrollToActiveButton');
+  button.addEventListener("click", (event) => {
+    const current = document.querySelector("[data-state=current], [data-state=next]");
+    scrollTo(current);
+  });
   
   return button;
 }

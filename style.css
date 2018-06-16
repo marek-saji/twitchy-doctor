@@ -25,7 +25,7 @@ body {
 }
 
 .schedule {
-  position: relative;
+  overflow: hidden;
 }
 
 .schedule__header {
@@ -78,7 +78,23 @@ body {
 }
 
 .scrollToActiveButton {
+  --size: 1.2em;
+
   position: fixed;
-  top: 0;
+  bottom: 0;
   right: 0;
+  font-size: 3em;
+  width: var(--size);
+  height: var(--size);
+  padding: 0;
+  overflow: hidden;
+}
+
+.scrollToActiveButton::before {
+  content: '🎯';
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  line-height: var(--size);
+  text-align: center;
 }

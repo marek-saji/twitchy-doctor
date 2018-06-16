@@ -19,10 +19,10 @@ self.addEventListener('fetch', event => {
     caches.open('complete').then(cache => {
       return fetch(event.request)
         .then(response => {
-          if (event.request.match(/^https:/)) {
+          if (event.request.url.match(/^https:/)) {
             cache.put(event.request, response.clone());
-            return response || caches.match(event.request);
           }
+          return response || caches.match(event.request);
         })
         .catch(() => caches.match(event.request))
     })
